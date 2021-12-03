@@ -31,6 +31,8 @@ class JsonArray {
         jsonArray = s
     }
 
+    fun getJSONArray() = jsonArray
+
     //
     //  Methods
     //

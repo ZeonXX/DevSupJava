@@ -369,7 +369,7 @@ class Json {
     }
 
     fun put(key: String, jsonArray: JsonArray): Json {
-        jsonObject!![key] = jsonArray
+        jsonObject!![key] = jsonArray.getJSONArray()
         return this
     }
 
@@ -385,7 +385,7 @@ class Json {
         }
         val jsonArray = JSONArray()
         for (i in x) jsonArray.add(i)
-        jsonObject!![key] = jsonArray.toJSONString()
+        jsonObject!![key] = jsonArray
         return this
     }
 
@@ -406,7 +406,7 @@ class Json {
         val jsonArray = JSONArray()
         for (i in x)
             jsonArray.add(i)
-        jsonObject!![key] = jsonArray.toJSONString()
+        jsonObject!![key] = jsonArray
         return this
     }
 
@@ -418,7 +418,7 @@ class Json {
         val jsonArray = JSONArray()
         for (i in x)
             jsonArray.add(i)
-        jsonObject!![key] = jsonArray.toJSONString()
+        jsonObject!![key] = jsonArray
         return this
     }
 
@@ -430,7 +430,7 @@ class Json {
         val jsonArray = JSONArray()
         for (i in x)
             jsonArray.add(i)
-        jsonObject!![key] = jsonArray.toJSONString()
+        jsonObject!![key] = jsonArray
         return this
     }
 
@@ -442,7 +442,7 @@ class Json {
         val jsonArray = JSONArray()
         for (i in x)
             jsonArray.add(i)
-        jsonObject!![key] = jsonArray.toJSONString()
+        jsonObject!![key] = jsonArray
         return this
     }
 
@@ -454,7 +454,7 @@ class Json {
         val jsonArray = JSONArray()
         for (i in x)
             jsonArray.add(i)
-        jsonObject!![key] = jsonArray.toJSONString()
+        jsonObject!![key] = jsonArray
         return this
     }
 
@@ -465,8 +465,8 @@ class Json {
         }
         val jsonArray = JSONArray()
         for (i in x)
-            jsonArray.add(i)
-        jsonObject!![key] = jsonArray.toJSONString()
+            jsonArray.add(i.getJSONArray())
+        jsonObject!![key] = jsonArray
         return this
     }
 
@@ -478,7 +478,7 @@ class Json {
         val jsonArray = JSONArray()
         for (i in x)
             jsonArray.add(i)
-        jsonObject!![key] = jsonArray.toJSONString()
+        jsonObject!![key] = jsonArray
         return this
     }
 
@@ -490,7 +490,7 @@ class Json {
         val jsonArray = JSONArray()
         for (i in x)
             jsonArray.add(i.json(true, Json()))
-        jsonObject!![key] = jsonArray.toJSONString()
+        jsonObject!![key] = jsonArray
         return this
     }
 
