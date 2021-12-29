@@ -53,6 +53,14 @@ object ToolsFiles {
         return BufferedWriter(OutputStreamWriter(FileOutputStream(path), Charset.forName("UTF8")))
     }
 
+    fun readLineOrNull(file: File, l: Long = 0):String?{
+        return try{
+            readLine(file.absolutePath, l)
+        }catch (e:Exception){
+            null;
+        }
+    }
+
     fun readLine(file: File, l: Long = 0) = readLine(file.absolutePath, l)
 
     fun readLine(path: String, l: Long = 0): String {
