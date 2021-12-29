@@ -266,12 +266,12 @@ object ToolsFiles {
         fileOrDirectory.delete()
     }
 
-   /* fun getDiskCacheDir(): File? {
-        if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState() || !Environment.isExternalStorageRemovable()) {
-            val externalCacheDir: File = SupAndroid.appContext!!.getExternalCacheDir()
-            if (externalCacheDir != null) return File(SupAndroid.appContext!!.getExternalCacheDir().getPath())
-        }
-        return File(SupAndroid.appContext!!.getCacheDir().getPath())
-    }*/
+    /* fun getDiskCacheDir(): File? {
+         if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState() || !Environment.isExternalStorageRemovable()) {
+             val externalCacheDir: File = SupAndroid.appContext!!.getExternalCacheDir()
+             if (externalCacheDir != null) return File(SupAndroid.appContext!!.getExternalCacheDir().getPath())
+         }
+         return File(SupAndroid.appContext!!.getCacheDir().getPath())
+     }*/
 
 }
