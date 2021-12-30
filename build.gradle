@@ -11,9 +11,6 @@ jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
-
 repositories {
     mavenCentral()
 }
