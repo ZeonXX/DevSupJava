@@ -1,4 +1,5 @@
 package com.sup.dev.java.tools
+import java.util.Base64
 
 object ToolsBytes {
 
@@ -22,6 +23,16 @@ object ToolsBytes {
         if (isPng(bytes)) return "png"
         if (isJpg(bytes)) return "jpg"
         return if (isGif(bytes)) "gif" else null
+    }
+
+    @Suppress("NewApi")
+    fun fromBase64(s:String):ByteArray{
+        return Base64.getDecoder().decode(s)
+    }
+
+    @Suppress("NewApi")
+    fun toBase64(bytes:ByteArray):String{
+        return Base64.getEncoder().encodeToString(bytes)
     }
 
 }
