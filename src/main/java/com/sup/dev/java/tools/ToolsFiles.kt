@@ -57,7 +57,7 @@ object ToolsFiles {
         return try{
             readLine(file.absolutePath, l)
         }catch (e:Exception){
-            null;
+            null
         }
     }
 
@@ -83,6 +83,14 @@ object ToolsFiles {
 
             }
 
+        }
+    }
+
+    fun readListOrNull(path: String): ArrayList<String>? {
+        return try{
+            readList(path)
+        }catch (e:Exception){
+            null
         }
     }
 
