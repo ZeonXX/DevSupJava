@@ -6,6 +6,7 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
 import kotlin.experimental.xor
+import com.sup.dev.java.libs.bcrypt.BCrypt
 
 object ToolsCryptography {
 
@@ -38,17 +39,6 @@ object ToolsCryptography {
         return md5Hex
     }
 
-    fun encode(pText: String, pKey: String): ByteArray {
-        val txt = ToolsText.toBytes(pText)
-        val key = ToolsText.toBytes(pKey)
-        val res = ByteArray(pText.length)
-
-        for (i in txt.indices)
-            res[i] = (txt[i] xor key[i % key.size])
-
-        return res
-    }
-
     fun decode(pText: ByteArray, pKey: String): String {
         val res = ByteArray(pText.size)
         val key = ToolsText.toBytes(pKey)
@@ -56,6 +46,33 @@ object ToolsCryptography {
         for (i in pText.indices)
             res[i] = (pText[i] xor key[i % key.size])
         return ToolsText.toString(res)
+    }
+
+    fun bcrypt(st: String, salt:String=bcryptSalt()): String {
+        return BCrypt.hashpw(st, salt)
+    }
+
+    fun bcryptCheck(st: String, stBCrypt: String): Boolean {
+        return BCrypt.checkpw(st, stBCrypt)
+    }
+
+    fun bcryptSalt(logRounds:Int = 12): String {
+        return BCrypt.gensalt(logRounds)
+    }
+
+    fun getSHA512(input:String):String{
+        val md: MessageDigest = MessageDigest.getInstance("SHA-512")
+        val messageDigest = md.digest(input.toByteArray())
+
+        val no = BigInteger(1, messageDigest)
+
+        var hashtext: String = no.toString(16)
+
+        while (hashtext.length < 32) {
+            hashtext = "0$hashtext"
+        }
+
+        return hashtext
     }
 
 }
