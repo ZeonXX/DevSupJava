@@ -1,42 +1,52 @@
 package com.sup.dev.java.libs.text_format
 
 import com.sup.dev.java.libs.debug.err
+import com.sup.dev.java.libs.debug.info
 import com.sup.dev.java.tools.ToolsText
+import java.util.*
 
 class TextFormatter(
         val text: String
 ) {
-
     private val char_protector = '\\'
     private val char_protector_word = '@'
     private val char_no_format = "[noFormat]"
     private val char_no_format_end = "[/noFormat]"
     private val chars_spec = arrayOf(char_protector, char_protector_word, '*', '^', '~', '_', '{', '}')
+    private val colors = hashMapOf(
+        "red" to "D32F2F", "pink" to "C2185B", "purple" to "7B1FA2", "indigo" to "303F9F",
+        "blue" to "1976D2", "cyan" to "0097A7", "teal" to "00796B", "green" to "388E3C",
+        "lime" to "689F38", "yellow" to "FBC02D", "amber" to "FFA000", "orange" to "F57C00",
+        "brown" to "5D4037", "grey" to "616161", "campfire" to "FF6D00", "rainbow" to "-",
+        "gay" to "-", "xmas" to "-", "christmas" to "-",
+    )
 
-    private val textLow = text.toLowerCase()
-    private var result: String? = null
+    private val textLow = text.toLowerCase(Locale.ROOT)
+    private var result: StringBuilder? = null
     private var i = 0
     private var skipToSpace = false
     private var skipToNextNoFormat = false
 
     fun parseHtml(): String {
+        val start = System.currentTimeMillis()
         if (result == null) parseText()
-        return result!!
+        info("TextFormatter: parsed in ${System.currentTimeMillis() - start}ms: (${text.length}) ${text.subSequence(0, 100.coerceAtMost(text.length))}")
+        return result.toString()
     }
 
     fun parseNoTags(): String {
-        return parseHtml().replace(Regex("\\<[^>]*>"), "")
+        return parseHtml().replace(Regex("<[^>]*>"), "")
     }
 
     private fun parseText() {
-        result = ""
+        result = StringBuilder(text.length + 128)
         while (i < text.length) {
             if (skipToSpace) {
                 if (text[i] == ' ') {
                     skipToSpace = false
                     if (text[i - 1] != char_protector_word && chars_spec.contains(text[i - 1])) i--
                 } else {
-                    result += text[i++]
+                    result!!.append(text[i++])
                     continue
                 }
             }
@@ -48,7 +58,7 @@ class TextFormatter(
                     skipToNextNoFormat = false
                     continue
                 } else {
-                    result += text[i++]
+                    result!!.append(text[i++])
                     continue
                 }
             }
@@ -57,7 +67,7 @@ class TextFormatter(
                     && text.length > i + 1
                     && (text[i + 1] != char_protector && chars_spec.contains(text[i + 1]))) {
                 i++
-                result += text[i++]
+                result!!.append(text[i++])
                 continue
             }
 
@@ -70,46 +80,45 @@ class TextFormatter(
 
             if (text[i] == char_protector_word) {
                 skipToSpace = true
-                result += text[i++]
+                result!!.append(text[i++])
                 continue
             }
-            if (parseHtml('*', "<\$b>", "</\$b>")) continue
-            if (parseHtml('^', "<\$i>", "</\$i>")) continue
-            if (parseHtml('~', "<\$s>", "</\$s>")) continue
-            if (parseHtml('_', "<\$u>", "</\$u>")) continue
-            if (parseLink()) continue
-            if (parseColorHash()) continue
-            if (parseColorName("red", "D32F2F")) continue
-            if (parseColorName("pink", "C2185B")) continue
-            if (parseColorName("purple", "7B1FA2")) continue
-            if (parseColorName("indigo", "303F9F")) continue
-            if (parseColorName("blue", "1976D2")) continue
-            if (parseColorName("cyan", "0097A7")) continue
-            if (parseColorName("teal", "00796B")) continue
-            if (parseColorName("green", "388E3C")) continue
-            if (parseColorName("lime", "689F38")) continue
-            if (parseColorName("yellow", "FBC02D")) continue
-            if (parseColorName("amber", "FFA000")) continue
-            if (parseColorName("orange", "F57C00")) continue
-            if (parseColorName("brown", "5D4037")) continue
-            if (parseColorName("grey", "616161")) continue
-            if (parseColorName("campfire", "FF6D00")) continue
-            if (parseColorName("rainbow", "-")) continue
-            if (parseColorName("gay", "-")) continue
-            if (parseColorName("xmas", "-")) continue
-            if (parseColorName("christmas", "-")) continue
-            result += text[i++]
+            val skip = when (text[i]) {
+                '*' -> parseHtml('*', "<\$b>", "</\$b>")
+                '^' -> parseHtml('^', "<\$i>", "</\$i>")
+                '~' -> parseHtml('~', "<\$s>", "</\$s>")
+                '_' -> parseHtml('_', "<\$u>", "</\$u>")
+                '[' -> parseLink()
+                '{' -> run {
+                    if (parseColorHash()) return@run true
+                    for (color in colors) {
+                        var matches = true
+                        if (text.length - i < color.key.length + 2) continue
+
+                        val colorName = color.key + " "
+                        for (c in colorName.indices) {
+                            if (textLow[i + c + 1] != colorName[c]) {
+                                matches = false
+                                break
+                            }
+                        }
+                        if (matches) return@run parseColorName(color.key, color.value)
+                    }
+                    false
+                }
+                else -> false
+            }
+            if (skip) continue
+            result!!.append(text[i++])
         }
     }
 
     private fun parseHtml(c: Char, open: String, close: String): Boolean {
-        if (text[i] == c) {
-            val next = findNext(c, 0)
-            if (next != -1) {
-                result += open + TextFormatter(text.substring(i + 1, next)).parseHtml() + close
-                i = next + 1
-                return true
-            }
+        val next = findNext(c, 0)
+        if (next != -1) {
+            result!!.append(open + TextFormatter(text.substring(i + 1, next)).parseHtml() + close)
+            i = next + 1
+            return true
         }
         return false
     }
@@ -151,32 +160,26 @@ class TextFormatter(
 
     private fun parseColorName(name: String, hash: String): Boolean {
         try {
-            if (text[i] == '{') {
-                for (n in name.indices) if (textLow[i + 1 + n] != name[n]) return false
-
-                if (text[i + name.length + 1] == ' ') {
-                    val next = findNext('}', name.length + 1)
-                    if (next != -1) {
-                        if (name == "rainbow") {
-                            val t = text.substring(i + name.length + 2, next)
-                            var x = -1
-                            for (i in t) result += rainbow("$i", x++)
-                        } else if (name == "gay") {
-                            val t = text.substring(i + name.length + 2, next)
-                            var x = -1
-                            for (i in t) result += gay("$i", x++)
-                        } else if (name == "xmas" || name == "christmas") {
-                            val t = text.substring(i + name.length + 2, next)
-                            var x = -1
-                            for (i in t) result += xmas("$i", x++)
-                        } else {
-                            val t = TextFormatter(text.substring(i + name.length + 2, next)).parseHtml()
-                            result += "<font color=\"#$hash\">$t</font>"
-                        }
-                        i = next + 1
-                        return true
-                    }
+            val next = findNext('}', name.length + 1)
+            if (next != -1) {
+                if (name == "rainbow") {
+                    val t = text.substring(i + name.length + 2, next)
+                    var x = -1
+                    for (i in t) result!!.append(rainbow("$i", x++))
+                } else if (name == "gay") {
+                    val t = text.substring(i + name.length + 2, next)
+                    var x = -1
+                    for (i in t) result!!.append(gay("$i", x++))
+                } else if (name == "xmas" || name == "christmas") {
+                    val t = text.substring(i + name.length + 2, next)
+                    var x = -1
+                    for (i in t) result!!.append(xmas("$i", x++))
+                } else {
+                    val t = TextFormatter(text.substring(i + name.length + 2, next)).parseHtml()
+                    result!!.append("<font color=\"#$hash\">$t</font>")
                 }
+                i = next + 1
+                return true
             }
             return false
         } catch (e: Exception) {
@@ -222,26 +225,21 @@ class TextFormatter(
 
     private fun parseColorHash(): Boolean {
         try {
-            if (text[i] == '{') {
-                val c1 = nextColorChar(i + 1)
-                val c2 = nextColorChar(i + 2)
-                val c3 = nextColorChar(i + 3)
-                val c4 = nextColorChar(i + 4)
-                val c5 = nextColorChar(i + 5)
-                val c6 = nextColorChar(i + 6)
-                if (c1 != null && c2 != null && c3 != null && c4 != null && c5 != null && c6 != null && text[i + 7] == ' ') {
-                    val color = "" + c1 + c2 + c3 + c4 + c5 + c6
-                    val next = findNext('}', 7)
-                    if (next != -1) {
-                        result += "<font color=\"#$color\">${TextFormatter(
-                                text.substring(
-                                        i + 8,
-                                        next
-                                )
-                        ).parseHtml()}</font>"
-                        i = next + 1
-                        return true
-                    }
+            val c1 = nextColorChar(i + 1)
+            val c2 = nextColorChar(i + 2)
+            val c3 = nextColorChar(i + 3)
+            val c4 = nextColorChar(i + 4)
+            val c5 = nextColorChar(i + 5)
+            val c6 = nextColorChar(i + 6)
+            if (c1 != null && c2 != null && c3 != null && c4 != null && c5 != null && c6 != null && text[i + 7] == ' ') {
+                val color = "$c1$c2$c3$c4$c5$c6"
+                val next = findNext('}', 7)
+                if (next != -1) {
+                    result!!.append("<font color=\"#$color\">${
+                        TextFormatter(text.substring(i + 8, next)).parseHtml()
+                    }</font>")
+                    i = next + 1
+                    return true
                 }
             }
             return false
@@ -253,23 +251,21 @@ class TextFormatter(
 
     private fun parseLink(): Boolean {
         try {
-            if (text[i] == '[') {
-                val nextClose = findNext(']', 0)
+            val nextClose = findNext(']', 0)
 
-                if (nextClose == -1) return false
+            if (nextClose == -1) return false
 
-                var nextSpace = findNext(' ', nextClose - i)
-                if (nextSpace == -1) nextSpace = text.length
+            var nextSpace = findNext(' ', nextClose - i)
+            if (nextSpace == -1) nextSpace = text.length
 
-                if (ToolsText.TEXT_CHARS_s.contains(text[nextSpace - 1])) nextSpace--
-                val name = text.substring(i + 1, nextClose)
-                val link = text.substring(nextClose + 1, nextSpace)
+            if (ToolsText.TEXT_CHARS_s.contains(text[nextSpace - 1])) nextSpace--
+            val name = text.substring(i + 1, nextClose)
+            val link = text.substring(nextClose + 1, nextSpace)
 
-                if (ToolsText.isWebLink(link) || link.startsWith(char_protector_word)) {
-                    result += "<a href=\"${ToolsText.castToWebLink(link)}\">$name</a>"
-                    i = nextSpace
-                    return true
-                }
+            if (ToolsText.isWebLink(link) || link.startsWith(char_protector_word)) {
+                result!!.append("<a href=\"${ToolsText.castToWebLink(link)}\">$name</a>")
+                i = nextSpace
+                return true
             }
             return false
         } catch (e: Exception) {
@@ -279,8 +275,7 @@ class TextFormatter(
     }
 
     private fun nextColorChar(i: Int): Char? {
-        if (text[i] == '0' || text[i] == '1' || text[i] == '2' || text[i] == '3' || text[i] == '4' || text[i] == '5' || text[i] == '6' || text[i] == '7' || text[i] == '8' || text[i] == '9' || textLow[i] == 'a' || textLow[i] == 'b' || textLow[i] == 'c' || textLow[i] == 'd' || textLow[i] == 'e' || textLow[i] == 'f') return text[i]
+        if ("0123456789abcdef".contains(textLow[i])) return text[i]
         return null
     }
-
 }
