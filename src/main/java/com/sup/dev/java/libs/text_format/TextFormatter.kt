@@ -1,7 +1,6 @@
 package com.sup.dev.java.libs.text_format
 
 import com.sup.dev.java.libs.debug.err
-import com.sup.dev.java.libs.debug.info
 import com.sup.dev.java.tools.ToolsText
 import java.util.*
 
@@ -28,9 +27,7 @@ class TextFormatter(
     private var skipToNextNoFormat = false
 
     fun parseHtml(): String {
-        val start = System.currentTimeMillis()
         if (result == null) parseText()
-        info("TextFormatter: parsed in ${System.currentTimeMillis() - start}ms: (${text.length}) ${text.subSequence(0, 100.coerceAtMost(text.length))}")
         return result.toString()
     }
 
