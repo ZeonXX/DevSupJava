@@ -26,7 +26,7 @@ object ToolsText {
     fun equalsNoCase(vararg s: String): Boolean {
         val s1 = s[0]
         for (i in 1 until s.size) {
-            if (s1.toLowerCase(Locale.ROOT) != s[i].toLowerCase(Locale.ROOT)) return false
+            if (s1.lowercase(Locale.ROOT) != s[i].lowercase(Locale.ROOT)) return false
         }
         return true
     }
@@ -45,7 +45,7 @@ object ToolsText {
 
     fun languageCodeAsLong(languageCode: String): Long {
         var languageCodeV = languageCode
-        languageCodeV = languageCodeV.trim { it <= ' ' }.toLowerCase(Locale.ROOT)
+        languageCodeV = languageCodeV.trim { it <= ' ' }.lowercase(Locale.ROOT)
         val x = StringBuilder()
         for (i in 0 until languageCodeV.length) {
             val c = languageCodeV[i]
@@ -84,7 +84,7 @@ object ToolsText {
 
     fun isOnlyChars(s: String, vararg charsArrays: CharArray): Boolean {
         var sV = s
-        sV = sV.toLowerCase(Locale.ROOT)
+        sV = sV.lowercase(Locale.ROOT)
 
         for (element in sV) {
             var b = false
@@ -165,10 +165,10 @@ object ToolsText {
     @JvmOverloads
     fun checkStringChars(string: String?, chars: String, checkCase: Boolean = false): Boolean {
         var charsV = chars
-        if (!checkCase) charsV = charsV.toLowerCase(Locale.ROOT)
+        if (!checkCase) charsV = charsV.lowercase(Locale.ROOT)
         for (element in string!!) {
             var c = element + ""
-            if (!checkCase) c = c.toLowerCase(Locale.ROOT)
+            if (!checkCase) c = c.lowercase(Locale.ROOT)
             if (!charsV.contains(c)) return false
         }
         return true
@@ -317,7 +317,7 @@ object ToolsText {
     fun clearWebLinkPrefix(s: String): String {
         val l = arrayOf("https://", "http://", "https://www.", "http://www.", "https://m.", "http://m.")
         for (f in l)
-            if (s.length > f.length && s.substring(0, f.length).toLowerCase() == f)
+            if (s.length > f.length && s.substring(0, f.length).lowercase(Locale.getDefault()) == f)
                 return s.substring(f.length)
         return s
     }

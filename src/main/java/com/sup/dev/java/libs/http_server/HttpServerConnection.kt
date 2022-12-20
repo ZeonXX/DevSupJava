@@ -31,7 +31,7 @@ class HttpServerConnection(
             var headerValue = split[1]
             for (i in 2 until split.size) headerValue += ": " + split[i]
             data.header[headerKey] = headerValue
-            if (headerKey.toLowerCase() == "content-length") messageLen = headerValue.toInt()
+            if (headerKey.lowercase() == "content-length") messageLen = headerValue.toInt()
         }
 
         val buf = CharArray(1024)
