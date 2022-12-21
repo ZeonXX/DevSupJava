@@ -2,7 +2,6 @@ package com.sup.dev.java.libs.text_format
 
 import com.sup.dev.java.libs.debug.err
 import com.sup.dev.java.tools.ToolsText
-import java.util.*
 
 class TextFormatter(
         val text: String
@@ -20,7 +19,7 @@ class TextFormatter(
         "gay" to "-", "xmas" to "-", "christmas" to "-",
     )
 
-    private val textLow = text.toLowerCase(Locale.ROOT)
+    private val textLow = text.lowercase()
     private var result: StringBuilder? = null
     private var i = 0
     private var skipToSpace = false
