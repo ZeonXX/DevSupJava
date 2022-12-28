@@ -56,11 +56,11 @@ class UtilsHttp(url:String){
     fun readLine():String{
         if(dis == null) dis = DataInputStream(getInputStream())
 
-        var c = dis!!.readByte().toInt().toChar()
+        var c = dis!!.readByte().toChar()
         var text = ""
         while (c != '\n' && c != '\r'){
             text += c
-            c = dis!!.readByte().toInt().toChar()
+            c = dis!!.readByte().toChar()
         }
         return text
     }
