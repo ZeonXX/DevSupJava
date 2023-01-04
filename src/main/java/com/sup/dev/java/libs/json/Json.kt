@@ -1,8 +1,6 @@
 package com.sup.dev.java.libs.json
 
-import com.sup.dev.java.classes.items.Item2
 import com.sup.dev.java.libs.debug.err
-import com.sup.dev.java.libs.debug.log
 import com.sup.dev.java.tools.ToolsClass
 import com.sup.dev.java.tools.ToolsMapper
 import com.sup.dev.java.tools.ToolsText
@@ -494,5 +492,19 @@ class Json {
         return this
     }
 
+    //
+    //  Etc
+    //
 
+    fun isEmpty() = jsonObject?.isEmpty() ?: true
+
+    fun isNotEmpty() = jsonObject?.isNotEmpty() ?: false
+
+    fun forEach(action: (key: String, value: Any?) -> Unit) {
+        for (item in jsonObject ?: emptyMap()) {
+            action(item.key as String, item.value)
+        }
+    }
+
+    fun toMap(): Map<Any?, Any?> = jsonObject?.toMap() ?: emptyMap()
 }

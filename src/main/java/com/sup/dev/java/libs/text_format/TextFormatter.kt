@@ -27,7 +27,7 @@ class TextFormatter(
     private var skipToNextNoFormat = false
 
     fun parseHtml(): String {
-        if (result.isEmpty()) parseText()
+        if (result.length == 0) parseText()
         return result.toString()
     }
 
