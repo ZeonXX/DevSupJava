@@ -3,7 +3,6 @@ package com.sup.dev.java.tools
 import java.io.BufferedReader
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
-import java.lang.Exception
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import kotlin.experimental.and
@@ -43,8 +42,8 @@ object ToolsMapper {
     fun asShort(v: Any): Short {
         if (v is Int) return v.toShort()
         if (v is Long) return v.toShort()
-        if (v is Float) return v.toShort()
-        if (v is Double) return v.toShort()
+        if (v is Float) return v.toInt().toShort()
+        if (v is Double) return v.toInt().toShort()
         if (v is String) return v.toShort()
         if (v is Byte) return v.toShort()
         if (v is ByteArray) return ByteBuffer.wrap(v).short

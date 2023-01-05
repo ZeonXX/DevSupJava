@@ -2,6 +2,7 @@ package com.sup.dev.java.tools
 
 import com.sup.dev.java.classes.geometry.Dimensions
 import com.sup.dev.java.classes.geometry.Point
+import java.util.*
 
 object ToolsMath {
 
@@ -109,6 +110,12 @@ object ToolsMath {
         return if (max == min) min
         else if (max > min) (Math.random() * ((max + 1) - min)).toInt() + min
         else (Math.random() * ((min+1) - max)).toInt() + max
+    }
+
+    fun randomInt(min: Int, max: Int, random: Random): Int {
+        return if (max == min) min
+        else if (max > min) (random.nextDouble() * ((max + 1) - min)).toInt() + min
+        else (random.nextDouble() * ((min+1) - max)).toInt() + max
     }
 
     fun randomFloat(min: Float, max: Float): Float {

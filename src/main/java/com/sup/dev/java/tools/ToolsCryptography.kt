@@ -1,12 +1,12 @@
 package com.sup.dev.java.tools
 
+import com.sup.dev.java.libs.bcrypt.BCrypt
 import com.sup.dev.java.libs.debug.err
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
 import kotlin.experimental.xor
-import com.sup.dev.java.libs.bcrypt.BCrypt
 
 object ToolsCryptography {
 
@@ -14,7 +14,8 @@ object ToolsCryptography {
         val random = Random()
         val text = CharArray(length)
         for (i in 0 until length) {
-            val c = random.nextInt(Character.MAX_CODE_POINT).toChar()
+            // ascii-only
+            val c = (random.nextInt(95) + 32).toChar()
             text[i] = c
         }
         return String(text)

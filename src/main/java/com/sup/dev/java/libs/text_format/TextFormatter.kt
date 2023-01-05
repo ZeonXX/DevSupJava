@@ -21,6 +21,7 @@ class TextFormatter(
         )
     }
 
+    private val textLow = text.lowercase()
     private var result: StringBuilder = StringBuilder()
     private var i = 0
     private var skipToSpace = false
