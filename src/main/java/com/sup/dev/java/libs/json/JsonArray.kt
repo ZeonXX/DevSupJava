@@ -124,6 +124,7 @@ class JsonArray {
             when {
                 jsonArray[i] == null -> array[i] = null
                 jsonArray[i] is JSONObject -> array[i] = Json(jsonArray[i] as JSONObject)
+                jsonArray[i] is Json -> array[i] = jsonArray[i] as Json
                 else -> array[i] = Json(jsonArray[i] as String)
             }
         return array

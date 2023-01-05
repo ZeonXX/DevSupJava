@@ -6,27 +6,28 @@ import com.sup.dev.java.tools.ToolsText
 class TextFormatter(
         val text: String
 ) {
-    private val char_protector = '\\'
-    private val char_protector_word = '@'
-    private val char_no_format = "[noFormat]"
-    private val char_no_format_end = "[/noFormat]"
-    private val chars_spec = arrayOf(char_protector, char_protector_word, '*', '^', '~', '_', '{', '}')
-    private val colors = hashMapOf(
-        "red" to "D32F2F", "pink" to "C2185B", "purple" to "7B1FA2", "indigo" to "303F9F",
-        "blue" to "1976D2", "cyan" to "0097A7", "teal" to "00796B", "green" to "388E3C",
-        "lime" to "689F38", "yellow" to "FBC02D", "amber" to "FFA000", "orange" to "F57C00",
-        "brown" to "5D4037", "grey" to "616161", "campfire" to "FF6D00", "rainbow" to "-",
-        "gay" to "-", "xmas" to "-", "christmas" to "-",
-    )
+    companion object {
+        private val char_protector = '\\'
+        private val char_protector_word = '@'
+        private val char_no_format = "[noFormat]"
+        private val char_no_format_end = "[/noFormat]"
+        private val chars_spec = arrayOf(char_protector, char_protector_word, '*', '^', '~', '_', '{', '}')
+        private val colors = hashMapOf(
+            "red" to "D32F2F", "pink" to "C2185B", "purple" to "7B1FA2", "indigo" to "303F9F",
+            "blue" to "1976D2", "cyan" to "0097A7", "teal" to "00796B", "green" to "388E3C",
+            "lime" to "689F38", "yellow" to "FBC02D", "amber" to "FFA000", "orange" to "F57C00",
+            "brown" to "5D4037", "grey" to "616161", "campfire" to "FF6D00", "rainbow" to "-",
+            "gay" to "-", "xmas" to "-", "christmas" to "-",
+        )
+    }
 
-    private val textLow = text.lowercase()
-    private var result: StringBuilder? = null
+    private var result: StringBuilder = StringBuilder()
     private var i = 0
     private var skipToSpace = false
     private var skipToNextNoFormat = false
 
     fun parseHtml(): String {
-        if (result == null) parseText()
+        if (result.length == 0) parseText()
         return result.toString()
     }
 
@@ -37,49 +38,54 @@ class TextFormatter(
     private fun parseText() {
         result = StringBuilder(text.length + 128)
         while (i < text.length) {
+            val thisChar = text[i]
+
             if (skipToSpace) {
-                if (text[i] == ' ') {
+                if (thisChar == ' ') {
                     skipToSpace = false
                     if (text[i - 1] != char_protector_word && chars_spec.contains(text[i - 1])) i--
                 } else {
-                    result!!.append(text[i++])
+                    result.append(thisChar)
+                    i++
                     continue
                 }
             }
 
             if (skipToNextNoFormat) {
-                if (text[i] == '[' && text.length - i >= char_no_format_end.length && text.substring(i, i + char_no_format_end.length) == char_no_format_end
+                if (thisChar == '[' && text.length - i >= char_no_format_end.length && text.substring(i, i + char_no_format_end.length) == char_no_format_end
                         && (i == 0 || text[i - 1] != char_protector)) {
                     i += char_no_format_end.length
                     skipToNextNoFormat = false
                     continue
                 } else {
-                    result!!.append(text[i++])
+                    result.append(thisChar)
+                    i++
                     continue
                 }
             }
 
-            if (text[i] == char_protector
+            if (thisChar == char_protector
                     && text.length > i + 1
                     && (text[i + 1] != char_protector && chars_spec.contains(text[i + 1]))) {
-                i++
-                result!!.append(text[i++])
+                i += 2
+                result.append(thisChar)
                 continue
             }
 
-            if (text[i] == '[' && text.length - i >= char_no_format.length && text.substring(i, i + char_no_format.length) == char_no_format
+            if (thisChar == '[' && text.length - i >= char_no_format.length && text.substring(i, i + char_no_format.length) == char_no_format
                     && (i == 0 || text[i - 1] != char_protector)) {
                 i += char_no_format.length
                 skipToNextNoFormat = true
                 continue
             }
 
-            if (text[i] == char_protector_word) {
+            if (thisChar == char_protector_word) {
                 skipToSpace = true
-                result!!.append(text[i++])
+                result.append(thisChar)
+                i++
                 continue
             }
-            val skip = when (text[i]) {
+            val skip = when (thisChar) {
                 '*' -> parseHtml('*', "<\$b>", "</\$b>")
                 '^' -> parseHtml('^', "<\$i>", "</\$i>")
                 '~' -> parseHtml('~', "<\$s>", "</\$s>")
@@ -93,7 +99,7 @@ class TextFormatter(
 
                         val colorName = color.key + " "
                         for (c in colorName.indices) {
-                            if (textLow[i + c + 1] != colorName[c]) {
+                            if (text[i + c + 1].toLowerCase() != colorName[c]) {
                                 matches = false
                                 break
                             }
@@ -105,14 +111,15 @@ class TextFormatter(
                 else -> false
             }
             if (skip) continue
-            result!!.append(text[i++])
+            result.append(thisChar)
+            i++
         }
     }
 
     private fun parseHtml(c: Char, open: String, close: String): Boolean {
         val next = findNext(c, 0)
         if (next != -1) {
-            result!!.append(open + TextFormatter(text.substring(i + 1, next)).parseHtml() + close)
+            result.append(open + TextFormatter(text.substring(i + 1, next)).parseHtml() + close)
             i = next + 1
             return true
         }
@@ -161,18 +168,18 @@ class TextFormatter(
                 if (name == "rainbow") {
                     val t = text.substring(i + name.length + 2, next)
                     var x = -1
-                    for (i in t) result!!.append(rainbow("$i", x++))
+                    for (i in t) result.append(rainbow("$i", x++))
                 } else if (name == "gay") {
                     val t = text.substring(i + name.length + 2, next)
                     var x = -1
-                    for (i in t) result!!.append(gay("$i", x++))
+                    for (i in t) result.append(gay("$i", x++))
                 } else if (name == "xmas" || name == "christmas") {
                     val t = text.substring(i + name.length + 2, next)
                     var x = -1
-                    for (i in t) result!!.append(xmas("$i", x++))
+                    for (i in t) result.append(xmas("$i", x++))
                 } else {
                     val t = TextFormatter(text.substring(i + name.length + 2, next)).parseHtml()
-                    result!!.append("<font color=\"#$hash\">$t</font>")
+                    result.append("<font color=\"#$hash\">$t</font>")
                 }
                 i = next + 1
                 return true
@@ -231,7 +238,7 @@ class TextFormatter(
                 val color = "$c1$c2$c3$c4$c5$c6"
                 val next = findNext('}', 7)
                 if (next != -1) {
-                    result!!.append("<font color=\"#$color\">${
+                    result.append("<font color=\"#$color\">${
                         TextFormatter(text.substring(i + 8, next)).parseHtml()
                     }</font>")
                     i = next + 1
@@ -259,7 +266,7 @@ class TextFormatter(
             val link = text.substring(nextClose + 1, nextSpace)
 
             if (ToolsText.isWebLink(link) || link.startsWith(char_protector_word)) {
-                result!!.append("<a href=\"${ToolsText.castToWebLink(link)}\">$name</a>")
+                result.append("<a href=\"${ToolsText.castToWebLink(link)}\">$name</a>")
                 i = nextSpace
                 return true
             }
@@ -271,7 +278,7 @@ class TextFormatter(
     }
 
     private fun nextColorChar(i: Int): Char? {
-        if ("0123456789abcdef".contains(textLow[i])) return text[i]
+        if ("0123456789abcdef".contains(text[i].toLowerCase())) return text[i]
         return null
     }
 }
