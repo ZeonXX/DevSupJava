@@ -67,8 +67,8 @@ class TextFormatter(
             if (thisChar == char_protector
                     && text.length > i + 1
                     && (text[i + 1] != char_protector && chars_spec.contains(text[i + 1]))) {
-                i += 2
-                result.append(thisChar)
+                result.append(text[++i])
+                i++
                 continue
             }
 
